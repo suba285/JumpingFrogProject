@@ -120,28 +120,35 @@ void makeF(A * frog, SYM * syms) {
 void upF(A * frog, IN * in, bool * gover) {
     frog->cldwn -= 1;
     if (frog->cldwn < 0) {
-        if (in->dx != 0 or in->dy != 0) {frog->cldwn = 1; frog->count += 1;}
+        if (in->dx != 0 or in->dy != 0) {frog->cldwn = 1; frog->count += 1;
+}
         if (in->dx == -1) {
             if (frog->x - 1 > 1) frog->x -= 1;
             in->dx = 0;
-        }
+
+}
         if (in->dx == 1) {
             if (frog->x + 2 < W - 1) frog->x += 1;
             in->dx = 0;
-        }
+
+}
         if (in->dy == -1) {
             if (frog->y - 1 > 0) frog->y -= 1;
             in->dy = 0;
-        }
+
+}
         if (in->dy == 1) {
             if (frog->y + 1 < H) frog->y += 1;
             in->dy = 0;
-        }
+
+}
         // finish
         if (frog->y < 3) {
             *gover = true;
-        }
-    }
+
+}
+
+}
 }
 
 void drawF(A * frog, WINDOW * gw) {
@@ -166,22 +173,27 @@ void upS(A * stork, A * frog, bool * gover) {
     if (stork->x == frog->x and stork->y == frog->y) {
         frog->alive = false;
         *gover = true;
-    }
+
+}
     else if (stork->cldwn <= 0) {
         stork->cldwn = 5;
         int dx = frog->x - stork->x;
         int dy = frog->y - stork->y;
-        if (abs(dx) > abs(dy)) {
+        if (abs(dx) > abs(dy) and dx != 0) { // changed here
             stork-> x += dx / abs(dx);
-        }
-        if (abs(dy) > abs(dx)) {
+
+}
+        if (abs(dy) > abs(dx) and dy != 0) { // and here
             stork->y += dy / abs(dy);
-        }
-        if (abs(dx) == abs(dy)) {
+
+}
+        if (abs(dx) == abs(dy) and dx != 0 and dy != 0) { // here as well
             stork->x += dx / abs(dx);
             stork->y += dy / abs(dy);
-        }
-    }
+
+}
+
+}
     stork->cldwn -= 1;
 }
 
@@ -195,7 +207,8 @@ void drawSP(A * stork, WINDOW * gw) {
     CON(gw, CLP(YLW));
     char prop1[] = "x";
     char prop2[] = "+";
-    if (stork->cldwn % 2 == 0) {prop1[0] = '+'; prop2[0] = 'x';}
+    if (stork->cldwn % 2 == 0) {prop1[0] = '+'; prop2[0] = 'x';
+}
     PT(gw, stork->y - 1, stork->x - 1, prop1);
     PT(gw, stork->y + 1, stork->x + 1, prop1);
     PT(gw, stork->y - 1, stork->x + 1, prop2);
@@ -213,7 +226,8 @@ void getIn(IN * in, WINDOW * gw) {
         if (c == 's') in->dy = 1;
         if (c == 'a') in->dx = -1;
         if (c == 'd') in->dx = 1;
-    }
+
+}
     in->curpress = c;
 }
 
@@ -224,7 +238,8 @@ void Timer(WINDOW * sw, TMR * timer, bool * falive) {
     if (timer->mil < 0) {
         timer->mil = 10000;
         timer->sec -= 1;
-    }
+
+}
     char *ctm = (char *) malloc(sizeof("00"));
     int clr = WHT; // colour (clr)
     if (timer->sec < 10) clr = RED;
@@ -247,8 +262,10 @@ void Zz(float t) {
 }
 
 void calPts(int * pts, int moves, int sec) {
-    int mlt = int((NLNS + 1) * 10 / moves);
-    *pts = mlt * sec;
+    if (moves > 0) { // changed this
+        int mlt = int((NLNS + 1) * 10 / moves);
+        *pts = mlt * sec;
+    }
 }
 
 void ixcPts(int pts, char * cpts) {
@@ -284,13 +301,17 @@ void FsymRead(SYM * syms) {
                 case 3: syms->fc[idx] = csym; break;
                 case 4: syms->sc[idx] = csym; break;
                 case 5: syms->log[idx] = csym;
-            }
-        } else {
+
+}
+
+} else {
             cnum++;
             idx = -1;
-        }
+
+}
         idx++;
-    }
+
+}
 }
 
 void FspdRead(int * spd) {
@@ -317,7 +338,8 @@ void makeLns (LNS * lns) {
     for (int cln = 0; cln < NLNS; cln++) {
         if (isle and lns->mode == 1) {
             lns->isl[cln] = true;
-        }
+
+}
         else {
             int rd = (double)rand() / RAND_MAX * (range2x2 - range1) + range1;
             if (rd > 2) rd = 2; // not sure whether "inclusive" means both sides
@@ -325,7 +347,8 @@ void makeLns (LNS * lns) {
                 case 0: lns->rtns[cln] = true; lns->dirs[cln] = L; break;
                 case 1: lns->rtns[cln] = false; lns->dirs[cln] = R; break;
                 case 2: lns->rtns[cln] = false; lns->dirs[cln] = L; break;
-            }
+
+}
             rd = (double)rand() / RAND_MAX * (range2x2 - range1) + range1;
             if (rd > 2) rd = 2;
             lns->x[cln] = ((double)rand() / RAND_MAX) * (W - CL - 1) + 1;
@@ -341,11 +364,14 @@ void makeLns (LNS * lns) {
                 lns->tr[cln][i] = 0;
                 rd = (double)rand() / RAND_MAX * (range2x48 - range1) + range1;
                 if (rd == 0 and lns->mode == 3) lns->tr[cln][i] = i + 2;
-            }
-        }
+
+}
+
+}
         if (lns->mode == 1)
             isle = !isle;
-    }
+
+}
 }
 
 void drawLns (LNS * lns, WINDOW * gw, SYM * syms) {
@@ -354,8 +380,10 @@ void drawLns (LNS * lns, WINDOW * gw, SYM * syms) {
         if (lns->isl[cln]) {
             for (int i = 1; i < W - 1; i++) {
                 PT(gw, y, i, "/");
-            }
-        }
+
+}
+
+}
         else {
             // traps
             CON(gw, CLP(YLW));
@@ -369,29 +397,37 @@ void drawLns (LNS * lns, WINDOW * gw, SYM * syms) {
                     ar = ">";
                     if (lns->dirs[cln] == L) ar = "<";
                     PT(gw, y, i, ar);
-                }
-            }
+
+}
+
+}
             // setting appropriate colour
             int col = lns->clr[cln];
             // if the car has changed type it will flash blue (col = BLU every second frame)
             if (lns->ntp[cln] > 0) {
                 if (lns->ntp[cln] % 2 == 1) col = BLU;
                 lns->ntp[cln] -= 1;
-            }
+
+}
             // drawing cars
             CON(gw, CLP(col));
             if (lns->tp[cln] == 0) {
                 PT(gw, y, lns->x[cln], syms->sc);
-            }
+
+}
             else if (lns->tp[cln] == 1) {
                 PT(gw, y, lns->x[cln], syms->fc);
-            }
+
+}
             else if (lns->tp[cln] == 2) {
                 PT(gw, y, lns->x[cln], syms->log);
-            }
+
+}
             COFF(gw, CLP(col));
-        }
-    }
+
+}
+
+}
 }
 
 // submethod - log collisions - stopping
@@ -401,9 +437,12 @@ void logStop(int cln, LNS * lns, A * F, int Y) {
         if (F->y >= Y - 1 and F->y <= Y + 1) {
             if (F->x >= lns->x[cln] - 1 and F->x <= lns->x[cln] + CL) {
                 lns->stop[cln] = true;
-            }
-        }
-    }
+
+}
+
+}
+
+}
 }
 
 // submethod - deadly car collisions and frog carry
@@ -417,11 +456,15 @@ void carCol(int cln, LNS * lns, A * F, int Y) {
                 if (lns->x[cln] >= 1 and lns->x[cln] + 1 <= W - 4) {
                     F->x = lns->x[cln] + 1 + int(0.5 + 0.5 * lns->dirs[cln]);
                     F->alive = true;
-                }
-            } else
+
+}
+
+} else
                 F->alive = false;
-        }
-    }
+
+}
+
+}
 }
 
 void upLns (LNS * lns, A * F) { // F is frog in this method
@@ -437,25 +480,31 @@ void upLns (LNS * lns, A * F) { // F is frog in this method
                 if (lns->B[cln]) {
                     if (lns->x[cln] > 10 - CL and lns->x[cln] < W - 10) {
                         spd = 2;
+
                     }
+
                 }
                 lns->x[cln] += lns->spd[cln] * spd * lns->dirs[cln];
+
             }
             // bouncing (rtn) cars bounce here
             if (lns->rtns[cln]) {
                 if (lns->x[cln] <= 2) lns->dirs[cln] = 1;
                 if (lns->x[cln] >= W - 2 - CL) lns->dirs[cln] = -1;
                 // regular car wrapping
-            } else {
+
+                } else {
                 int rd1 = (double)rand() / RAND_MAX * (range2x48 - range1) + range1;
                 int rd2 = (double)rand() / RAND_MAX * (range2x2 - range1) + range1;
                 bool out = false;
                 if (lns->x[cln] <= -CL + 2) {
                     out = true;
                     lns->x[cln] = W - 2;
-                } else if (lns->x[cln] >= W - 2) {
+
+}                else if (lns->x[cln] >= W - 2) {
                     out = true;
                     lns->x[cln] = -CL + 2;
+
                 }
                 if (out) {
                     if (rd1 == 0) {
@@ -463,8 +512,11 @@ void upLns (LNS * lns, A * F) { // F is frog in this method
                         lns->ntp[cln] = 15;
                         if (rd2 == 2) lns->clr[cln] = WHT;
                         else lns->clr[cln] = RED;
+
                     }
+
                 }
+
             }
             // frog collisions
             int Y = H - cln - 3; // Y is for comparison with frog y
@@ -472,7 +524,9 @@ void upLns (LNS * lns, A * F) { // F is frog in this method
             logStop(cln, lns, F, Y);
             // deadly car collisions and frog carry
             carCol(cln, lns, F, Y);
+
         }
+
     }
 }
 
@@ -484,6 +538,7 @@ void drawSF(WINDOW * gw) { // draws start and finish
             PT(gw, j, i, "/");
             PT(gw, H - j, i, "/");
         }
+
     }
 }
 
@@ -494,11 +549,14 @@ void drawTr(WINDOW * gw) { // transition
         for (int i = 1; i < H; i++) {
             for (int j = 1; j < W - 1; j++) {
                 PT(gw, i, j, &cursym);
-            }
-        }
+
+    }
+
+    }
         box(gw, 0, 0);
         RF(gw);
         Zz(1);
+
     }
     werase(gw);
     box(gw, 0, 0);
@@ -512,6 +570,7 @@ void menuBtn(WINDOW * gw, int num, int count, char * text, int y, int x) {
         col = BLC;
         PT(gw, y, x - 2, "~|");
         PT(gw, y, x + 18, "|~");
+
     }
     CON(gw, CLP(col));
     PT(gw, y, x, text);
@@ -522,22 +581,27 @@ void drawMenu(WINDOW * gw, bool * gon, bool * gplayed, LNS * lns, int * count, I
     werase(gw);
     box(gw, 0, 0);
     // moving between btns
-    if (in->dy == -1) {*count -= 1; in->dy = 0;}
-    if (in->dy == 1) {*count += 1; in->dy = 0;}
+    if (in->dy == -1) {*count -= 1; in->dy = 0;
+    }
+    if (in->dy == 1) {*count += 1; in->dy = 0;
+    }
     if (*count < 1) *count = 3;
     if (*count > 3) *count = 1;
     if (!*gplayed) {
         PT(gw, H / 2 - 5, W / 2 - 4, "> SPACE <");
         PT(gw, H / 2 - 3 , W / 2 - 1, "[W]");
         PT(gw, H / 2 - 2, W / 2 - 4, "[A][S][D]");
+
     } else {
         PT(gw, H / 2 - 3, W / 2 - 5, "PLAY AGAIN");
+
     }
     menuBtn(gw, 1, *count, "  LEVEL 1 (easy)  ", H / 2, W / 2 - 9);
     menuBtn(gw, 2, *count, " LEVEL 2 (medium) ", H / 2 + 2, W / 2 - 9);
     menuBtn(gw, 3, *count, "  LEVEL 3 (hard)  ", H / 2 + 4, W / 2 - 9);
     RF(gw);
-    if (in->curpress == ' ') {*gon = true; lns->mode = *count; makeLns(lns); drawTr(gw); in->dx = 0, in->dy = 0;}
+    if (in->curpress == ' ') {*gon = true; lns->mode = *count; makeLns(lns); drawTr(gw); in->dx = 0, in->dy = 0;
+    }
 }
 
 
@@ -556,6 +620,7 @@ void drawGame(WINDOW * gw, A * frog, A * stork, bool * gover, LNS * lns, SYM * s
     for (int i = 1; i < H; i++) {
         PT(gw, i, 1, " ");
         PT(gw, i, W - 2, " ");
+
     }
     if (*gover) {
         RF(gw);
@@ -568,8 +633,10 @@ void drawGame(WINDOW * gw, A * frog, A * stork, bool * gover, LNS * lns, SYM * s
             PT(gw, H / 2 - 1, W / 2 - 5, "score: ");
             PT(gw, H / 2 - 1, W / 2 + 2, cpts);
             free(cpts);
+
         }
         else PT(gw, H / 2, W / 2 - 5, " YOU LOOSE ");
+
     }
     RF(gw);
     if (*gover) {
@@ -577,6 +644,7 @@ void drawGame(WINDOW * gw, A * frog, A * stork, bool * gover, LNS * lns, SYM * s
         flushinp();
         makeF(frog, syms);
         makeS(stork, syms);
+
     }
 }
 
@@ -606,14 +674,18 @@ void GL(WINDOW * gw, WINDOW * sw, bool run, A * frog, A * stork, IN * in, bool *
                 timer->sec = 60;
                 PT(sw, 1, W - 3, "  ");
                 RF(sw);
-            }
+
+        }
+
         } else {
             getIn(in, gw);
             frog->count = 0;
             drawMenu(gw, &gon, gplayed, lns, &btncount, in);
+
         }
         Zz(1);
-    }
+
+}
 }
 
 // MAIN FUNCTION =======================================================================================================
